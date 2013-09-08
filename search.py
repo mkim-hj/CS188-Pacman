@@ -19,6 +19,8 @@ by Pacman agents (in searchAgents.py).
 """
 
 import util
+from util import *
+from game import Directions
 
 class SearchProblem:
     """
@@ -69,7 +71,6 @@ def tinyMazeSearch(problem):
     Returns a sequence of moves that solves tinyMaze.  For any other
     maze, the sequence of moves will be incorrect, so only use this for tinyMaze
     """
-    from game import Directions
     s = Directions.SOUTH
     w = Directions.WEST
     return  [s,s,w,s,w,w,s,w]
@@ -83,13 +84,36 @@ def depthFirstSearch(problem):
 
     To get started, you might want to try some of these simple commands to
     understand the search problem that is being passed in:
-
-    print "Start:", problem.getStartState()
-    print "Is the start a goal?", problem.isGoalState(problem.getStartState())
-    print "Start's successors:", problem.getSuccessors(problem.getStartState())
     """
-    "*** YOUR CODE HERE ***"
-    util.raiseNotDefined()
+    #print "Start:", problem.getStartState()
+    #print "Is the start a goal?", problem.isGoalState(problem.getStartState())
+    #print "Start's successors:", problem.getSuccessors(problem.getStartState())
+    
+    fringe = Stack()
+    closedSet = set()
+    list = []
+    startingNode = problem.getStartState()
+    list.insert(0, [startingNode])
+    fringe.push(list)
+    while not fringe.isEmpty():
+        list = fringe.pop()
+        frontNode = list[0][0]
+        if problem.isGoalState(frontNode):
+            list.pop()
+            retVal = []
+            while (len(list) > 0) :
+                lastNode = list.pop()
+                retVal.append(lastNode[1])
+            
+            return retVal #should actually make new list of actions
+        if not closedSet.__contains__(frontNode):
+            closedSet.add(frontNode)
+            for expandedNode in problem.getSuccessors(frontNode):
+                addList = list[:]
+                addList.insert(0, expandedNode)
+                fringe.push(addList)
+
+    return []
 
 def breadthFirstSearch(problem):
     """
