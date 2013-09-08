@@ -120,6 +120,34 @@ def breadthFirstSearch(problem):
     Search the shallowest nodes in the search tree first.
     """
     "*** YOUR CODE HERE ***"
+    fringe = Queue()
+    closedSet = set()
+    list = []
+    startingNode = problem.getStartState()
+    list.insert(0, [startingNode])
+    fringe.push(list)
+    while not fringe.isEmpty():
+        list = fringe.pop()
+        frontNode = list[0][0]
+        if problem.isGoalState(frontNode):
+            list.pop()
+            retVal = []
+            while (len(list) > 0) :
+                lastNode = list.pop()
+                retVal.append(lastNode[1])
+            
+            return retVal #should actually make new list of actions
+        if not closedSet.__contains__(frontNode):
+            closedSet.add(frontNode)
+            for expandedNode in problem.getSuccessors(frontNode):
+                addList = list[:]
+                addList.insert(0, expandedNode)
+                fringe.push(addList)
+    
+    return []
+    
+    
+    
     util.raiseNotDefined()
 
 def uniformCostSearch(problem):
