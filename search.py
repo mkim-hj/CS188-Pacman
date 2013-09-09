@@ -19,6 +19,7 @@ by Pacman agents (in searchAgents.py).
 """
 
 import util
+import searchAgents
 from util import *
 from game import Directions
 
@@ -192,8 +193,37 @@ def nullHeuristic(state, problem=None):
 def aStarSearch(problem, heuristic=nullHeuristic):
     "Search the node that has the lowest combined cost and heuristic first."
     "*** YOUR CODE HERE ***"
-    util.raiseNotDefined()
-
+    fringe = PriorityQueue()
+    closedSet = set()
+    list = []
+    startingNode = problem.getStartState()
+    list.insert(0, [startingNode])
+    fringe.push(list, 0)
+    while not fringe.isEmpty():
+        list = fringe.pop()
+        frontNode = list[0][0]
+        if problem.isGoalState(frontNode):
+            list.pop()
+            retVal = []
+            while (len(list) > 0) :
+                lastNode = list.pop()
+                retVal.append(lastNode[1])
+            
+            return retVal #should actually make new list of actions
+        if not closedSet.__contains__(frontNode):
+            closedSet.add(frontNode)
+            for expandedNode in problem.getSuccessors(frontNode):
+                addList = list[:]
+                addList.insert(0, expandedNode)
+                actions = []
+                addList2 = addList[:]
+                addList2.pop()
+                while (len(addList2) > 0) :
+                    lastNode = addList2.pop()
+                    actions.append(lastNode[1])
+                fringe.push(addList, problem.getCostOfActions(actions) + searchAgents.manhattanHeuristic(expandedNode[0], problem))
+    
+    return []
 
 # Abbreviations
 bfs = breadthFirstSearch
