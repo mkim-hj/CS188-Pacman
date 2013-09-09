@@ -136,13 +136,14 @@ def breadthFirstSearch(problem):
             while (len(list) > 0) :
                 lastNode = list.pop()
                 retVal.append(lastNode[1])
-            print retVal
+           
             return retVal #should actually make new list of actions
         if not closedSet.__contains__(frontNode):
             closedSet.add(frontNode)
             for expandedNode in problem.getSuccessors(frontNode):
                 addList = list[:]
                 addList.insert(0, expandedNode)
+                print addList
                 fringe.push(addList)
     
     return []
@@ -221,7 +222,7 @@ def aStarSearch(problem, heuristic=nullHeuristic):
                 while (len(addList2) > 0) :
                     lastNode = addList2.pop()
                     actions.append(lastNode[1])
-                fringe.push(addList, problem.getCostOfActions(actions) + searchAgents.manhattanHeuristic(expandedNode[0], problem))
+                fringe.push(addList, problem.getCostOfActions(actions) + heuristic(expandedNode[0], problem))
     
     return []
 
