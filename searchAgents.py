@@ -285,7 +285,7 @@ class CornersProblem(search.SearchProblem):
         # Please add any code here which you would like to use
         # in initializing the problem
         "*** YOUR CODE HERE ***"
-        self.numberOfCornersFound = 0
+        self.cornersFound = []
 
     def getStartState(self):
         "Returns the start state (in your state space, not the full Pacman state space)"
@@ -297,7 +297,7 @@ class CornersProblem(search.SearchProblem):
     def isGoalState(self, state):
         "Returns whether this search state is a goal state of the problem"
         "*** YOUR CODE HERE ***"
-        return self.numberOfCornersFound == 4
+        return len(self.cornersFound) == 4
         util.raiseNotDefined()
 
     def getSuccessors(self, state):
@@ -313,15 +313,10 @@ class CornersProblem(search.SearchProblem):
         """
 
         successors = []
-        if type(state[0]) is tuple:
-            x = state[0][0]
-            y = state[0][1]
-        else:
-            x = state[0]
-            y = state[0]
+        x, y = state
+        if (x,y) in self.corners and (x,y) not in self.cornersFound:
+            self.cornersFound.append((x,y))
 
-        if (x,y) in self.corners:
-            self.numberOfCornersFound = self.numberOfCornersFound + 1
 
         for action in [Directions.NORTH, Directions.SOUTH, Directions.EAST, Directions.WEST]:
             # Add a successor state to the successor list if the action is legal
@@ -332,13 +327,16 @@ class CornersProblem(search.SearchProblem):
             #   hitsWall = self.walls[nextx][nexty]
 
             "*** YOUR CODE HERE ***"
+
             dx,dy = Actions.directionToVector(action)
             nextx, nexty = int(x + dx), int(y + dy)
             if not self.walls[nextx][nexty]:
                 nextState = (nextx, nexty)
-                successors.append( ( nextState, action, 0) )
+                successors.append( ( nextState, action, 1) )
 
         self._expanded += 1
+        # print state
+        # print successors
         return successors
 
     def getCostOfActions(self, actions):

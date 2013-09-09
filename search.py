@@ -136,7 +136,7 @@ def breadthFirstSearch(problem):
             while (len(list) > 0) :
                 lastNode = list.pop()
                 retVal.append(lastNode[1])
-            
+            print retVal
             return retVal #should actually make new list of actions
         if not closedSet.__contains__(frontNode):
             closedSet.add(frontNode)
