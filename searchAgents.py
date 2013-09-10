@@ -39,6 +39,9 @@ from game import Directions
 from game import Agent
 from game import Actions
 import util
+from util import *
+from math import *
+
 import time
 import search
 
@@ -329,7 +332,7 @@ class CornersProblem(search.SearchProblem):
                  
             goals_found = [state[1],state[2],state[3],state[4]]
             for i in range(0,4):
-              if state[0] == self.corners[i]:
+              if nextState == self.corners[i]:
                 goals_found[i] = True
             
             successors.append( ((nextState, goals_found[0], goals_found[1], goals_found[2], goals_found[3]), action, 1) )
@@ -362,6 +365,10 @@ class CornersProblem(search.SearchProblem):
         return len(actions)
 
 
+def euclidianDistance( xy1, xy2 ):
+    "Returns the Manhattan distance between points xy1 and xy2"
+    return sqrt(pow( xy1[0] - xy2[0] , 2) + pow( xy1[1] - xy2[1] , 2 ))
+
 def cornersHeuristic(state, problem):
     """
     A heuristic for the CornersProblem that you defined.
@@ -379,7 +386,20 @@ def cornersHeuristic(state, problem):
     walls = problem.walls # These are the walls of the maze, as a Grid (game.py)
 
     "*** YOUR CODE HERE ***"
-    return 0 # Default to trivial solution
+    totalLeft = (not state[1]) + (not state[2]) + (not state[3]) + (not state[4])
+    if (totalLeft == 0) :
+        return 0
+    values = []
+    if (not state[1]) :
+        values.insert(0,manhattanDistance(state[0], corners[0]))
+    if (not state[2]) :
+        values.insert(0,manhattanDistance(state[0], corners[1]))
+    if (not state[3]) :
+        values.insert(0,manhattanDistance(state[0], corners[2]))
+    if (not state[4]) :
+        values.insert(0,manhattanDistance(state[0], corners[3]))
+    h = min(values)
+    return h
 
 class AStarCornersAgent(SearchAgent):
     "A SearchAgent for FoodSearchProblem using A* and your foodHeuristic"
