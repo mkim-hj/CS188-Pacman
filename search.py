@@ -87,8 +87,9 @@ class Node:
         currentNode = self
         while currentNode.getAction() is not None:
             listOfActions.append(currentNode.getAction())
-            currentNode = currentNode.getParent
-        return listOfActions.reverse()
+            currentNode = currentNode.getParent()
+        listOfActions.reverse()
+        return listOfActions
 
 
 def tinyMazeSearch(problem):
@@ -113,32 +114,21 @@ def depthFirstSearch(problem):
     #print "Start:", problem.getStartState()
     #print "Is the start a goal?", problem.isGoalState(problem.getStartState())
     #print "Start's successors:", problem.getSuccessors(problem.getStartState())
-    
+
     fringe = Stack()
     closedSet = set()
-    list = []
-    startingNode = problem.getStartState()
-    list.insert(0, [startingNode])
-    fringe.push(list)
-    while not fringe.isEmpty():
-        list = fringe.pop()
-        frontNode = list[0][0]
-        if problem.isGoalState(frontNode):
-            list.pop()
-            retVal = []
-            while (len(list) > 0) :
-                lastNode = list.pop()
-                retVal.append(lastNode[1])
-            
-            return retVal #should actually make new list of actions
-        if not closedSet.__contains__(frontNode):
-            closedSet.add(frontNode)
-            for expandedNode in problem.getSuccessors(frontNode):
-                addList = list[:]
-                addList.insert(0, expandedNode)
-                fringe.push(addList)
+    fringe.push(Node(problem.getStartState(), None, None, 0))
 
+    while (not fringe.isEmpty()):
+        node = fringe.pop()
+        if problem.isGoalState(node.getState()):
+            return node.pathToRoot()
+        if node.getState() not in closedSet:
+            closedSet.add(node.getState())
+            for childNode in problem.getSuccessors(node.getState()):
+                fringe.push(Node(childNode[0], node, childNode[1], childNode[2]))
     return []
+
 
 def breadthFirstSearch(problem):
     """
@@ -147,66 +137,35 @@ def breadthFirstSearch(problem):
     "*** YOUR CODE HERE ***"
     fringe = Queue()
     closedSet = set()
-    list = []
-    startingNode = problem.getStartState()
-    list.insert(0, [startingNode])
-    fringe.push(list)
-    while not fringe.isEmpty():
-        list = fringe.pop()
-        frontNode = list[0][0]
-        if problem.isGoalState(frontNode):
-            list.pop()
-            retVal = []
-            while (len(list) > 0) :
-                lastNode = list.pop()
-                retVal.append(lastNode[1])
-           
-            return retVal #should actually make new list of actions
-        if not closedSet.__contains__(frontNode):
-            closedSet.add(frontNode)
-            for expandedNode in problem.getSuccessors(frontNode):
-                addList = list[:]
-                addList.insert(0, expandedNode)
-                print addList
-                fringe.push(addList)
-    
+    fringe.push(Node(problem.getStartState(), None, None, 0))
+
+    while (not fringe.isEmpty()):
+        node = fringe.pop()
+        if problem.isGoalState(node.getState()):
+            return node.pathToRoot()
+        if node.getState() not in closedSet:
+            closedSet.add(node.getState())
+            for childNode in problem.getSuccessors(node.getState()):
+                fringe.push(Node(childNode[0], node, childNode[1], childNode[2]))
     return []
-    
+
 def uniformCostSearch(problem):
     "Search the node of least total cost first. "
     "*** YOUR CODE HERE ***"
     fringe = PriorityQueue()
     closedSet = set()
-    list = []
-    startingNode = problem.getStartState()
-    list.insert(0, [startingNode])
-    fringe.push(list, 0)
-    while not fringe.isEmpty():
-        list = fringe.pop()
-        frontNode = list[0][0]
-        if problem.isGoalState(frontNode):
-            list.pop()
-            retVal = []
-            while (len(list) > 0) :
-                lastNode = list.pop()
-                retVal.append(lastNode[1])
-            
-            return retVal #should actually make new list of actions
-        if not closedSet.__contains__(frontNode):
-            closedSet.add(frontNode)
-            for expandedNode in problem.getSuccessors(frontNode):
-                addList = list[:]
-                addList.insert(0, expandedNode)
-                actions = []
-                addList2 = addList[:]
-                addList2.pop()
-                while (len(addList2) > 0) :
-                    lastNode = addList2.pop()
-                    actions.append(lastNode[1])
-                fringe.push(addList, problem.getCostOfActions(actions))
-    
-    return []
+    fringe.push(Node(problem.getStartState(), None, None, 0), 0)
 
+    while (not fringe.isEmpty()):
+        node = fringe.pop()
+        if problem.isGoalState(node.getState()):
+            return node.pathToRoot()
+        if node.getState() not in closedSet:
+            closedSet.add(node.getState())
+            for childNode in problem.getSuccessors(node.getState()):
+                newNode = Node(childNode[0], node, childNode[1], childNode[2])
+                fringe.push(newNode, newNode.getCost())
+    return []
 
 def nullHeuristic(state, problem=None):
     """
@@ -218,36 +177,20 @@ def nullHeuristic(state, problem=None):
 def aStarSearch(problem, heuristic=nullHeuristic):
     "Search the node that has the lowest combined cost and heuristic first."
     "*** YOUR CODE HERE ***"
+
     fringe = PriorityQueue()
     closedSet = set()
-    list = []
-    startingNode = problem.getStartState()
-    list.insert(0, [startingNode])
-    fringe.push(list, 0)
-    while not fringe.isEmpty():
-        list = fringe.pop()
-        frontNode = list[0][0]
-        if problem.isGoalState(frontNode):
-            list.pop()
-            retVal = []
-            while (len(list) > 0) :
-                lastNode = list.pop()
-                retVal.append(lastNode[1])
-            
-            return retVal #should actually make new list of actions
-        if not closedSet.__contains__(frontNode):
-            closedSet.add(frontNode)
-            for expandedNode in problem.getSuccessors(frontNode):
-                addList = list[:]
-                addList.insert(0, expandedNode)
-                actions = []
-                addList2 = addList[:]
-                addList2.pop()
-                while (len(addList2) > 0) :
-                    lastNode = addList2.pop()
-                    actions.append(lastNode[1])
-                fringe.push(addList, problem.getCostOfActions(actions) + heuristic(expandedNode[0], problem))
-    
+    fringe.push(Node(problem.getStartState(), None, None, 0), 0)
+
+    while (not fringe.isEmpty()):
+        node = fringe.pop()
+        if problem.isGoalState(node.getState()):
+            return node.pathToRoot()
+        if node.getState() not in closedSet:
+            closedSet.add(node.getState())
+            for childNode in problem.getSuccessors(node.getState()):
+                newNode = Node(childNode[0], node, childNode[1], childNode[2])
+                fringe.push(newNode, newNode.getCost() + heuristic(newNode.getState(), problem))
     return []
 
 # Abbreviations
