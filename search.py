@@ -65,6 +65,30 @@ class SearchProblem:
         be composed of legal moves
         """
         util.raiseNotDefined()
+class Node:
+    def __init__ (self, state, parent, action, stepCost):
+        self.state = state
+        self.parent = parent
+        self.action = action
+        if parent == None:
+            self.cost = stepCost
+        else:
+            self.cost = stepCost + parent.cost
+    def getParent(self):
+        return self.parent
+    def getState(self):
+        return self.state
+    def getAction(self):
+        return self.action
+    def getCost(self):
+        return self.cost
+    def pathToRoot(self):
+        listOfActions =[]
+        currentNode = self
+        while currentNode.getAction() is not None:
+            listOfActions.append(currentNode.getAction())
+            currentNode = currentNode.getParent
+        return listOfActions.reverse()
 
 
 def tinyMazeSearch(problem):
