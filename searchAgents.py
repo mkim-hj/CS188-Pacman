@@ -41,10 +41,10 @@ from game import Actions
 import util
 from util import *
 from math import *
-
 import time
 import search
 from util import *
+from search import *
 
 class GoWestAgent(Agent):
     "An agent that goes West until it can't."
@@ -475,6 +475,11 @@ class FoodSearchProblem:
                 return 999999
             cost += 1
         return cost
+class Walls:
+    def __init__(self, walls):
+        self.walls = walls
+    def getWalls(self):
+        return self.walls
 
 class AStarFoodSearchAgent(SearchAgent):
     "A SearchAgent for FoodSearchProblem using A* and your foodHeuristic"
@@ -509,7 +514,14 @@ def foodHeuristic(state, problem):
     """
     position, foodGrid = state
     "*** YOUR CODE HERE ***"
-    return 0
+
+    # print problem.walls
+    foodList = foodGrid.asList()
+    if len(foodList) == 0:
+        return 0
+    distanceList = [mazeDistance(state[0], foodList[i], problem.startingGameState) for i in range(0, len(foodList))]
+    maxDistance = max(distanceList)
+    return maxDistance
 
 class ClosestDotSearchAgent(SearchAgent):
     "Search for all food using a sequence of searches"
@@ -537,7 +549,7 @@ class ClosestDotSearchAgent(SearchAgent):
         problem = AnyFoodSearchProblem(gameState)
 
         "*** YOUR CODE HERE ***"
-        util.raiseNotDefined()
+        return breadthFirstSearch(AnyFoodSearchProblem(gameState))
 
 class AnyFoodSearchProblem(PositionSearchProblem):
     """
@@ -570,8 +582,7 @@ class AnyFoodSearchProblem(PositionSearchProblem):
         The state is Pacman's position. Fill this in with a goal test
         that will complete the problem definition.
         """
-        x,y = state
-
+        return state in self.food.asList()
         "*** YOUR CODE HERE ***"
         util.raiseNotDefined()
 
