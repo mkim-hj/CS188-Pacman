@@ -375,13 +375,6 @@ def distanceOfDeadEnd(deadEndXY, walls):
                 distance = distance + 1
     return distance
 
-def cornersFound(state):
-    count = 0
-    for i in range (1, 4):
-        if state[i]:
-            count = count + 1
-    return count
-
 def euclidianDistance( xy1, xy2 ):
     "Returns the Manhattan distance between points xy1 and xy2"
     return sqrt(pow( xy1[0] - xy2[0] , 2) + pow( xy1[1] - xy2[1] , 2 ))
@@ -407,15 +400,23 @@ def cornersHeuristic(state, problem):
     if (totalLeft == 0) :
         return 0
     values = []
-    if (not state[1]) :
-        values.insert(0,manhattanDistance(state[0], corners[0]))
-    if (not state[2]) :
-        values.insert(0,manhattanDistance(state[0], corners[1]))
-    if (not state[3]) :
-        values.insert(0,manhattanDistance(state[0], corners[2]))
-    if (not state[4]) :
-        values.insert(0,manhattanDistance(state[0], corners[3]))
-    h = min(values)
+    for i in range(0,4):
+        if not state[i+1] :
+            values.append(manhattanDistance(state[0], corners[i]))
+    values.sort()
+    h = 0
+
+    if len(values) == 4:
+        alphaList = [.5, .5, .5, .5]
+    elif len(values) == 3:
+        alphaList = [.5, .5, .55]
+    elif len(values) == 2:
+        alphaList = [.5,.5]
+    else:
+        alphaList = [1]
+
+    for i in range(0, len(values)):
+        h = h + values[i] * alphaList[i]
     return h
 
 
