@@ -146,7 +146,8 @@ def breadthFirstSearch(problem):
         if node.getState() not in closedSet:
             closedSet.add(node.getState())
             for childNode in problem.getSuccessors(node.getState()):
-                fringe.push(Node(childNode[0], node, childNode[1], childNode[2]))
+                newNode = Node(childNode[0], node, childNode[1], childNode[2])
+                fringe.push(newNode)
     return []
 
 def uniformCostSearch(problem):

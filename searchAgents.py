@@ -39,6 +39,9 @@ from game import Directions
 from game import Agent
 from game import Actions
 import util
+from util import *
+from math import *
+
 import time
 import search
 from util import *
@@ -331,7 +334,6 @@ class CornersProblem(search.SearchProblem):
             for i in range(0,4):
               if nextState== self.corners[i]:
                 goalsFound[i] = True
-            
             successors.append( ((nextState, goalsFound[0], goalsFound[1], goalsFound[2], goalsFound[3]), action, 1) )
         self._expanded += 1
         return successors
@@ -380,6 +382,10 @@ def cornersFound(state):
             count = count + 1
     return count
 
+def euclidianDistance( xy1, xy2 ):
+    "Returns the Manhattan distance between points xy1 and xy2"
+    return sqrt(pow( xy1[0] - xy2[0] , 2) + pow( xy1[1] - xy2[1] , 2 ))
+
 def cornersHeuristic(state, problem):
     """
     A heuristic for the CornersProblem that you defined.
@@ -397,26 +403,20 @@ def cornersHeuristic(state, problem):
     walls = problem.walls # These are the walls of the maze, as a Grid (game.py)
 
     "*** YOUR CODE HERE ***"
-    if (cornersFound == 4):
+    totalLeft = (not state[1]) + (not state[2]) + (not state[3]) + (not state[4])
+    if (totalLeft == 0) :
         return 0
-
-    cornerList = [corner for corner in corners]
-    cornerListCopy =[]
-    for i in range (0,4):
-        if not state[i+1]:
-            cornerListCopy.append(cornerList[i])
-    cornerList = cornerListCopy
-    if len(cornerList) == 0:
-        return 0
-
-    distanceToCorners = [manhattanDistance(state[0], corner) for corner in cornerList]
-    # print cornerList, cornersFound(state), distanceToCorners
-    closestCorner = min(distanceToCorners)
-    indexOfClosestCorner = distanceToCorners.index(closestCorner)
-
-    distanceToOtherCorners = sum(distanceToCorners) - manhattanDistance(state[0], cornerList[indexOfClosestCorner])
-    # print cornersFound(state), (manhattanDistance(state[0], cornerList[indexOfClosestCorner]) + .2 * distanceToOtherCorners)
-    return (manhattanDistance(state[0], cornerList[indexOfClosestCorner]) + .7 * distanceToOtherCorners)
+    values = []
+    if (not state[1]) :
+        values.insert(0,manhattanDistance(state[0], corners[0]))
+    if (not state[2]) :
+        values.insert(0,manhattanDistance(state[0], corners[1]))
+    if (not state[3]) :
+        values.insert(0,manhattanDistance(state[0], corners[2]))
+    if (not state[4]) :
+        values.insert(0,manhattanDistance(state[0], corners[3]))
+    h = min(values)
+    return h
 
 
 class AStarCornersAgent(SearchAgent):
