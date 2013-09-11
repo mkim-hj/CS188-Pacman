@@ -41,6 +41,7 @@ from game import Actions
 import util
 import time
 import search
+from util import *
 
 class GoWestAgent(Agent):
     "An agent that goes West until it can't."
@@ -285,7 +286,6 @@ class CornersProblem(search.SearchProblem):
         # Please add any code here which you would like to use
         # in initializing the problem
         "*** YOUR CODE HERE ***"
-        self.cornersFound = []
 
     def getStartState(self):
         "Returns the start state (in your state space, not the full Pacman state space)"
@@ -296,7 +296,7 @@ class CornersProblem(search.SearchProblem):
     def isGoalState(self, state):
         "Returns whether this search state is a goal state of the problem"
         "*** YOUR CODE HERE ***"
-        #util.raiseNotDefined()    
+        #util.raiseNotDefined()
         return state[1] and state[2] and state[3] and state[4]
        
     def getSuccessors(self, state):
@@ -326,25 +326,13 @@ class CornersProblem(search.SearchProblem):
           nextx, nexty = int(x + dx), int(y + dy)
           if not self.walls[nextx][nexty]:
             nextState = (nextx, nexty)
-                 
-            goals_found = [state[1],state[2],state[3],state[4]]
+
+            goalsFound = [state[1],state[2],state[3],state[4]]
             for i in range(0,4):
-              if state[0] == self.corners[i]:
-                goals_found[i] = True
+              if nextState== self.corners[i]:
+                goalsFound[i] = True
             
-            successors.append( ((nextState, goals_found[0], goals_found[1], goals_found[2], goals_found[3]), action, 1) )
-            
-            #if state[0] == self.corners[0]:
-            #  successors.append( ((nextState, True, state[2], state[3], state[4]), action, 1) )
-            #elif state[0] == self.corners[1]:
-            #  successors.append( ((nextState, state[1], True, state[3], state[4]), action, 1) )
-            #elif state[0] == self.corners[2]:
-            #  successors.append( ((nextState, state[1], state[2], True, state[4]), action, 1) )
-            #elif state[0] == self.corners[3]:
-            #  successors.append( ((nextState, state[1], state[2], state[3], True), action, 1) )
-            #else:
-            #  successors.append( ((nextState, state[1], state[2], state[3], state[4]), action, 1) )
-          
+            successors.append( ((nextState, goalsFound[0], goalsFound[1], goalsFound[2], goalsFound[3]), action, 1) )
         self._expanded += 1
         return successors
 
@@ -361,6 +349,36 @@ class CornersProblem(search.SearchProblem):
             if self.walls[x][y]: return 999999
         return len(actions)
 
+def countWalls(food, walls, number=3):
+    wallCount = 0
+    x,y = food
+    for action in [Directions.NORTH, Directions.SOUTH, Directions.EAST, Directions.WEST]:
+        dx, dy = Actions.directionToVector(action)
+        nextx, nexty = int(x + dx), int(y + dy)
+        if walls[nextx][nexty]:
+            wallCount = wallCount + 1
+    if wallCount == number:
+        return True
+    return False
+
+def distanceOfDeadEnd(deadEndXY, walls):
+    x,y = deadEndXY
+    distance = 0
+    for action in [Directions.NORTH, Directions.SOUTH, Directions.EAST, Directions.WEST]:
+        dx, dy = Actions.directionToVector(action)
+        nextx, nexty = int(x + dx), int(y + dy)
+        if not walls[nextx][nexty]:
+            while (countWalls[nextx][nexty] == 2):
+                nextx, nexty = int(next + dx), int(nexty + dy)
+                distance = distance + 1
+    return distance
+
+def cornersFound(state):
+    count = 0
+    for i in range (1, 4):
+        if state[i]:
+            count = count + 1
+    return count
 
 def cornersHeuristic(state, problem):
     """
@@ -379,7 +397,27 @@ def cornersHeuristic(state, problem):
     walls = problem.walls # These are the walls of the maze, as a Grid (game.py)
 
     "*** YOUR CODE HERE ***"
-    return 0 # Default to trivial solution
+    if (cornersFound == 4):
+        return 0
+
+    cornerList = [corner for corner in corners]
+    cornerListCopy =[]
+    for i in range (0,4):
+        if not state[i+1]:
+            cornerListCopy.append(cornerList[i])
+    cornerList = cornerListCopy
+    if len(cornerList) == 0:
+        return 0
+
+    distanceToCorners = [manhattanDistance(state[0], corner) for corner in cornerList]
+    # print cornerList, cornersFound(state), distanceToCorners
+    closestCorner = min(distanceToCorners)
+    indexOfClosestCorner = distanceToCorners.index(closestCorner)
+
+    distanceToOtherCorners = sum(distanceToCorners) - manhattanDistance(state[0], cornerList[indexOfClosestCorner])
+    # print cornersFound(state), (manhattanDistance(state[0], cornerList[indexOfClosestCorner]) + .2 * distanceToOtherCorners)
+    return (manhattanDistance(state[0], cornerList[indexOfClosestCorner]) + .7 * distanceToOtherCorners)
+
 
 class AStarCornersAgent(SearchAgent):
     "A SearchAgent for FoodSearchProblem using A* and your foodHeuristic"
